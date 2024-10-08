@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Security Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Header -->
+    <nav class="bg-blue-800 p-4">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="text-white font-bold text-lg">Network Security Dashboard</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto mt-10">
+        <!-- Section: Connected Devices -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Perangkat Terhubung</h2>
+            <table class="min-w-full bg-white">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="py-2 px-4">IP Address</th>
+                        <th class="py-2 px-4">MAC Address</th>
+                        <th class="py-2 px-4">Vendor</th>
+                        <th class="py-2 px-4">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="device-list" class="text-gray-700">
+                    <!-- Devices will be dynamically added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section: Security Actions -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Protect DDoS and Spam -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Proteksi DDoS & Spam</h2>
+                <button onclick="start_protection()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Aktifkan Proteksi
+                </button>
+            </div>
+
+            <!-- Hacker Protection -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Deteksi Hacker</h2>
+                <button onclick="start_hacker_protection()" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Aktifkan Deteksi Hacker
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-10">
+        <div class="container mx-auto py-4 text-center text-white">
+            &copy; 2024 Network Security Dashboard. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Fetch perangkat terhubung dan tampilkan di tabel
+        fetch('/')
+            .then(response => response.json())
+            .then(data => {
+                let deviceList = document.getElementById('device-list');
+                data.devices.forEach(device => {
+                    let row = `<tr class="border-b">
+                                <td class="py-2 px-4">${device.ip}</td>
+                                <td class="py-2 px-4">${device.mac}</td>
+                                <td class="py-2 px-4">${device.vendor}</td>
+                                <td class="py-2 px-4">
+                                    <button onclick="disconnectDevice('${device.mac}')" class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">
+                                        Putuskan
+                                    </button>
+                                </td>
+                            </tr>`;
+                    deviceList.innerHTML += row;
+                });
+            });
+
+        // Fungsi untuk memutus perangkat berdasarkan MAC Address
+        function disconnectDevice(mac) {
+            fetch(`/disconnect/${mac}`)
+                .then(response => response.json())
+                .then(data => {
+                    alert(`Perangkat dengan MAC: ${mac} telah diputus.`);
+                    location.reload(); // Reload halaman setelah putus perangkat
+                });
+        }
+
+        // Fungsi untuk memulai proteksi DDoS & Spam
+        function start_protection() {
+            fetch('/protect_ddos')
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.status);
+                });
+        }
+
+        // Fungsi untuk memulai deteksi hacker
+        function start_hacker_protection() {
+            fetch('/start_hacker_protection')
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.status);
+                });
+        }
+    </script>
+</body>
+</html>
